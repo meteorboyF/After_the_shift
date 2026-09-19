@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { get as idbGet, set as idbSet } from 'idb-keyval'
 import { api } from '../lib/api.js'
 import { cancelQueued, enqueue, onDelivered } from '../lib/outbox.js'
+import { seedRelief } from '../lib/demoSeed.js'
 
 const STORE_KEY = 'ats-relief'
 
@@ -39,7 +40,16 @@ export const useRelief = create((set, get) => ({
     // tally is populated for a demo, then let local win from then on.
     if (stored.length > 0) return
     const remote = await api.listRelief()
-    if (!remote?.length || get().requests.length > 0) return
+    if (get().requests.length > 0) return
+
+    // Same reasoning as check-ins: the tally is the answer to P7, and an empty
+    // one on a hosted demo would make his point rather than the counter-point.
+    if (!remote?.length) {
+      const seeded = seedRelief()
+      set({ requests: seeded })
+      await idbSet(STORE_KEY, seeded)
+      return
+    }
 
     const adopted = remote.map((r) => ({
       localId: crypto.randomUUID(),

@@ -5,6 +5,7 @@ import BigButton from '../../components/BigButton.jsx'
 import Icon from '../../components/Icon.jsx'
 import { useT } from '../../lib/useT.js'
 import { useSupervisor } from '../../store/supervisor.js'
+import { isApiConfigured } from '../../lib/api.js'
 import { formatDateTime } from '../../lib/time.js'
 
 const TYPE_LABEL_KEY = {
@@ -56,8 +57,18 @@ export default function SupervisorScreen() {
       </div>
 
       {loaded && rows.length === 0 ? (
-        <div className="flex flex-1 items-center justify-center">
-          <p className="text-base text-muted">{t('supervisor.empty')}</p>
+        <div className="flex flex-1 flex-col items-center justify-center gap-2 text-center">
+          {/* Distinguish "no requests" from "no server". On the hosted build
+              this page genuinely cannot work, and saying so is better than an
+              empty list that reads as a bug. */}
+          <p className="text-label text-cream">
+            {isApiConfigured() ? t('supervisor.empty') : t('supervisor.needsServer')}
+          </p>
+          {!isApiConfigured() && (
+            <p className="measure-wide text-base leading-relaxed text-muted">
+              {t('supervisor.needsServerBody')}
+            </p>
+          )}
         </div>
       ) : (
         <ul className="mt-5 flex flex-1 flex-col gap-3">

@@ -104,7 +104,9 @@ export default function App() {
   }, [lang])
 
   return (
-    <BrowserRouter>
+    // basename keeps routing correct when the app is served from a repo
+    // subpath on GitHub Pages. It is "/" for local development.
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
       <PinGate>
         <AppRoutes />
       </PinGate>

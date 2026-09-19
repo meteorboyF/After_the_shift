@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { get as idbGet, set as idbSet } from 'idb-keyval'
 import { api } from '../lib/api.js'
 import { cancelQueued, enqueue, onDelivered } from '../lib/outbox.js'
+import { seedCheckIns } from '../lib/demoSeed.js'
 import { summarise } from '../lib/summary.js'
 
 const STORE_KEY = 'ats-checkins'
@@ -32,7 +33,17 @@ export const useCheckins = create((set, get) => ({
     if (stored.length > 0) return
 
     const remote = await api.listCheckIns()
-    if (!remote?.length || get().entries.length > 0) return
+    if (get().entries.length > 0) return
+
+    // No backend, or an empty one: seed the device so the week strip and the
+    // derived line have something to say. An empty summary is the screen P7
+    // rejected, and the hosted build has no server to adopt history from.
+    if (!remote?.length) {
+      const seeded = seedCheckIns()
+      set({ entries: seeded })
+      await idbSet(STORE_KEY, seeded)
+      return
+    }
 
     const adopted = remote.map((entry) => ({
       localId: crypto.randomUUID(),

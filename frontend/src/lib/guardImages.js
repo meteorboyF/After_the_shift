@@ -51,7 +51,10 @@ export function pickGuardImage(key, seed = 0) {
   const files = MANIFEST[key]
   if (!files || files.length === 0) return null
   const index = Math.abs(Math.trunc(seed)) % files.length
-  return `/images/guards/${files[index]}`
+  // BASE_URL, not a bare "/": on GitHub Pages the app is served from
+  // /After_the_shift/, and a root-absolute path here would 404 on every screen.
+  // Vite rewrites asset URLs in HTML and CSS, but not strings built at runtime.
+  return `${import.meta.env.BASE_URL}images/guards/${files[index]}`
 }
 
 export default MANIFEST

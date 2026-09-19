@@ -135,6 +135,9 @@ export default {
     empty: 'No requests',
     accept: 'Accept',
     back: 'Back',
+    needsServer: 'This page reads the server directly',
+    needsServerBody:
+      'The guard’s own screens run entirely on the phone. This one does not — run the backend to see it.',
   },
 
   entries: {

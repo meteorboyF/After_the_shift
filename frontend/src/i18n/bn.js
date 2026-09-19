@@ -154,6 +154,10 @@ export default {
     empty: 'কোনো অনুরোধ নেই',
     accept: 'গ্রহণ',
     back: 'ফিরে যান',
+    // Shown on the hosted build, which has no server behind it. Says why the
+    // list is empty instead of looking broken.
+    needsServer: 'এই পাতা সরাসরি সার্ভার থেকে পড়ে',
+    needsServerBody: 'গার্ডের নিজের পাতাগুলো ফোনেই চলে, কিন্তু এটি চলে না।',
   },
 
   entries: {

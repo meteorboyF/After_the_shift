@@ -1,5 +1,5 @@
 import { get as idbGet, set as idbSet } from 'idb-keyval'
-import { api } from './api.js'
+import { api, isApiConfigured } from './api.js'
 
 const QUEUE_KEY = 'ats-outbox'
 
@@ -78,6 +78,9 @@ export async function pendingCount() {
  */
 export async function flush() {
   if (flushing) return { sent: 0, remaining: null }
+  // No backend configured at all (the hosted build). Entries stay queued
+  // harmlessly rather than being retried against nothing.
+  if (!isApiConfigured()) return { sent: 0, remaining: null }
   if (typeof navigator !== 'undefined' && navigator.onLine === false) {
     return { sent: 0, remaining: null }
   }

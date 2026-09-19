@@ -4,15 +4,30 @@ import axios from 'axios'
  * The backend is optional by design (rule 8). Every call here is best-effort:
  * the UI reads from local storage and never waits on, or fails because of, a
  * request made from this module.
+ *
+ * On the hosted build there is no backend at all. Rather than let the app fire
+ * requests at http://localhost:8080 from an https:// page — which the browser
+ * blocks as mixed content and which fills the console with errors on every
+ * screen — the base resolves to null and every call short-circuits. Set
+ * VITE_API_BASE at build time to point a hosted frontend at a real server.
  */
-const client = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE ?? 'http://localhost:8080/api',
-  timeout: 6000,
-  headers: { 'X-Guard-Id': 'demo-guard' },
-})
+const API_BASE =
+  import.meta.env.VITE_API_BASE ?? (import.meta.env.DEV ? 'http://localhost:8080/api' : null)
+
+/** True when a backend is configured. The outbox checks this before flushing. */
+export const isApiConfigured = () => API_BASE !== null
+
+const client = API_BASE
+  ? axios.create({
+      baseURL: API_BASE,
+      timeout: 6000,
+      headers: { 'X-Guard-Id': 'demo-guard' },
+    })
+  : null
 
 /** Resolves to null instead of throwing, so callers need no try/catch. */
 async function attempt(request) {
+  if (!client) return null
   try {
     return await request()
   } catch {

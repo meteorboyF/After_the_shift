@@ -87,6 +87,22 @@ withdrawn request is never delivered late.
 
 For a presentation walkthrough, see [DEMO.md](DEMO.md).
 
+**Hosted demo:** https://meteorboyf.github.io/After_the_shift/
+
+The hosted build is the guard-facing app only — the Spring Boot backend needs a JVM host and is
+not deployed. That is not a degraded mode: writes go to IndexedDB, and when no API is
+configured the device seeds its own demo history (`src/lib/demoSeed.js`) so the week strip and
+the monthly tally are never empty. The one screen that genuinely cannot work without a server
+is `/supervisor`, which reads it directly and says so.
+
+`import.meta.env.DEV` is false in any production build, so `npm run build` produces a bundle
+with no backend at all — the API URL is dead-code eliminated. Use `npm run dev` for local work
+against the backend, or build with an explicit base to point a production bundle at a server:
+
+```bash
+VITE_API_BASE=http://localhost:8080/api npm run build
+```
+
 ### Backend
 
 Maven does not need to be installed; the wrapper fetches it on first run.
