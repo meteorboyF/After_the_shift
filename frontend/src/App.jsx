@@ -1,34 +1,96 @@
-import { homeKey, pickGuardImage } from './lib/guardImages.js'
+import { useEffect } from 'react'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import HomeScreen from './features/home/HomeScreen.jsx'
+import PinScreen from './features/pin/PinScreen.jsx'
+import PhasePlaceholder from './components/PhasePlaceholder.jsx'
+import { useSettings } from './store/settings.js'
+import { isPinSupported } from './lib/pin.js'
+import { useT } from './lib/useT.js'
 
 /**
- * Phase 0 placeholder. This exists only to prove the scaffold boots with the
- * Bangla font, the amber-on-ink palette and the guard photo pipeline wired up.
- * Phase 1 replaces it with the real router, shell and design system.
+ * Routes render directly — no AnimatePresence wrapper.
+ *
+ * The documented `<AnimatePresence mode="wait">` + keyed `<Routes>` pattern
+ * stalls here: under React 19's StrictMode the exiting child never reports
+ * completion, so the URL changes while the previous screen stays on screen
+ * permanently. A frozen screen mid-presentation is not a risk worth an exit
+ * animation, so each screen animates on mount instead (ScreenShell) and nothing
+ * gates the swap. The visible result is the same fade + 12px slide the spec
+ * asks for, minus the crossfade on the way out.
  */
-export default function App() {
-  const photo = pickGuardImage(homeKey(), 0)
+function AppRoutes() {
+  const { t } = useT()
 
   return (
-    <main className="relative mx-auto flex min-h-dvh max-w-screenish flex-col justify-center overflow-hidden px-6">
-      {photo && (
-        <img
-          src={photo}
-          alt=""
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-[0.28] [filter:grayscale(1)_sepia(1)_saturate(2.2)_hue-rotate(-12deg)]"
-        />
-      )}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_50%_0%,rgba(232,161,58,0.16),transparent_62%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink/70 via-ink/60 to-ink" />
+    <Routes>
+      <Route path="/" element={<HomeScreen />} />
 
-      <div className="relative">
-        <p className="text-sm uppercase tracking-[0.22em] text-amber">After the Shift</p>
-        <h1 className="measure mt-3 text-display font-semibold text-cream">শিফটের পরে</h1>
-        <p className="measure-wide mt-4 text-base text-muted">
-          স্ক্যাফোল্ড প্রস্তুত। পরের ধাপে আসল স্ক্রিনগুলো।
-        </p>
-        <div className="mt-8 h-1 w-24 rounded-full bg-amber shadow-glow" />
-      </div>
-    </main>
+      {/* Phase 2 — Task 1 */}
+      <Route
+        path="/record"
+        element={<PhasePlaceholder title={t('home.speak')} guard="night_post" />}
+      />
+      <Route
+        path="/entries"
+        element={<PhasePlaceholder title={t('common.pastEntries')} guard="resting" />}
+      />
+
+      {/* Phase 3 — Task 2 */}
+      <Route
+        path="/grounding"
+        element={<PhasePlaceholder title={t('home.hardTime')} guard="after_incident" />}
+      />
+
+      {/* Phase 4 — Task 3 */}
+      <Route
+        path="/relief"
+        element={<PhasePlaceholder title={t('common.appName')} guard="relief_granted" />}
+      />
+      <Route
+        path="/supervisor"
+        element={<PhasePlaceholder title={t('common.appName')} guard="day_post" />}
+      />
+
+      <Route
+        path="/help"
+        element={<PhasePlaceholder title={t('common.help')} guard="greeting" />}
+      />
+
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  )
+}
+
+/**
+ * The PIN shell. Not a security boundary and not one of the three tasks — it
+ * just keeps the check-in screens off the lock screen.
+ *
+ * Where SubtleCrypto is unavailable (a non-secure context) the PIN is skipped
+ * entirely rather than falling back to storing the digits in the clear.
+ */
+function PinGate({ children }) {
+  const { pinHash, pinSkipped, unlocked } = useSettings()
+
+  if (!isPinSupported()) return children
+  if (!pinHash && !pinSkipped) return <PinScreen mode="set" />
+  if (pinHash && !unlocked) return <PinScreen mode="unlock" />
+  return children
+}
+
+export default function App() {
+  const lang = useSettings((s) => s.lang)
+
+  // Keep <html lang> in step with the toggle, so a screen reader announces
+  // Bangla with Bangla phonetics rather than reading it as mislabelled English.
+  useEffect(() => {
+    document.documentElement.lang = lang
+  }, [lang])
+
+  return (
+    <BrowserRouter>
+      <PinGate>
+        <AppRoutes />
+      </PinGate>
+    </BrowserRouter>
   )
 }
