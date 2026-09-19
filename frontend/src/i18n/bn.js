@@ -93,6 +93,55 @@ export default {
     again: 'আবার',
   },
 
+  // Task 3 — the only place this app touches the hierarchy. Every screen has
+  // to make visible what a supervisor will and will not see.
+  relief: {
+    heading: 'কি দরকার?',
+    noReasonNeeded: 'কারণ বলা লাগবে না',
+    // P8's own words. Not renamed into generic categories.
+    rest: 'আধা ঘণ্টা বিশ্রাম',
+    swap: 'পোস্ট বদল',
+    shade: 'ছায়ায় পোস্ট',
+
+    reasonHeading: 'কারণ যুক্ত করবেন?',
+    sendWithoutReason: 'কারণ ছাড়াই পাঠান',
+    attachReason: 'কারণ যুক্ত করুন',
+    recording: 'শুনছি',
+    reasonAttached: 'কারণ যুক্ত হয়েছে',
+
+    previewHeading: 'সুপারভাইজার এটাই দেখবেন',
+    willNotSee: 'যা দেখতে পাবেন না',
+    checkins: 'চেক-ইন',
+    recordings: 'রেকর্ড',
+    exercises: 'ব্যায়াম',
+    send: 'পাঠান',
+    cancel: 'বাতিল',
+
+    statusHeading: 'অনুরোধ',
+    pending: 'অপেক্ষায়',
+    accepted: 'গ্রহণ করা হয়েছে',
+    rejected: 'এবার হয়নি',
+    withdraw: 'বাতিল করুন',
+    // The tally. This is the proof the app does something — do not omit it.
+    tallyRequests: 'এই মাসে {n}টি অনুরোধ',
+    tallyAccepted: '{n}টি গ্রহণ করা হয়েছে',
+    empty: 'কোনো অনুরোধ নেই',
+    newRequest: 'নতুন অনুরোধ',
+    justNow: 'এইমাত্র',
+    minutesAgo: '{n} মিনিট আগে',
+    hoursAgo: '{n} ঘণ্টা আগে',
+  },
+
+  supervisor: {
+    heading: 'সুপারভাইজার',
+    subtitle: 'শুধু বিশ্রামের অনুরোধ',
+    // Spelled out on the supervisor's own screen, not only the guard's.
+    noAccess: 'চেক-ইন, রেকর্ড ও ব্যায়াম এখানে নেই',
+    empty: 'কোনো অনুরোধ নেই',
+    accept: 'গ্রহণ',
+    back: 'ফিরে যান',
+  },
+
   entries: {
     heading: 'আগের রেকর্ড',
     empty: 'এখনো কিছু নেই',

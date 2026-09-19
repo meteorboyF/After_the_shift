@@ -80,6 +80,50 @@ export default {
     again: 'Again',
   },
 
+  relief: {
+    heading: 'What do you need?',
+    noReasonNeeded: 'You do not have to give a reason',
+    rest: 'Half an hour of rest',
+    swap: 'Change of post',
+    shade: 'A post in the shade',
+
+    reasonHeading: 'Attach a reason?',
+    sendWithoutReason: 'Send without a reason',
+    attachReason: 'Attach the reason',
+    recording: 'Listening',
+    reasonAttached: 'Reason attached',
+
+    previewHeading: 'Your supervisor will see only this',
+    willNotSee: 'What they will not see',
+    checkins: 'Check-ins',
+    recordings: 'Recordings',
+    exercises: 'Exercises',
+    send: 'Send',
+    cancel: 'Cancel',
+
+    statusHeading: 'Requests',
+    pending: 'Waiting',
+    accepted: 'Accepted',
+    rejected: 'Not this time',
+    withdraw: 'Withdraw request',
+    tallyRequests: '{n} requests this month',
+    tallyAccepted: '{n} accepted',
+    empty: 'No requests',
+    newRequest: 'New request',
+    justNow: 'Just now',
+    minutesAgo: '{n} min ago',
+    hoursAgo: '{n} hours ago',
+  },
+
+  supervisor: {
+    heading: 'Supervisor',
+    subtitle: 'Relief requests only',
+    noAccess: 'Check-ins, recordings and exercises are not here',
+    empty: 'No requests',
+    accept: 'Accept',
+    back: 'Back',
+  },
+
   entries: {
     heading: 'Past entries',
     empty: 'Nothing here yet',

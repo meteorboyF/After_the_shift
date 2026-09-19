@@ -9,9 +9,15 @@ import EntriesScreen from './features/checkin/EntriesScreen.jsx'
 import ChooseScreen from './features/grounding/ChooseScreen.jsx'
 import ExerciseScreen from './features/grounding/ExerciseScreen.jsx'
 import GroundingDoneScreen from './features/grounding/GroundingDoneScreen.jsx'
+import NeedScreen from './features/relief/NeedScreen.jsx'
+import ReasonScreen from './features/relief/ReasonScreen.jsx'
+import PreviewScreen from './features/relief/PreviewScreen.jsx'
+import StatusScreen from './features/relief/StatusScreen.jsx'
+import SupervisorScreen from './features/supervisor/SupervisorScreen.jsx'
 import PhasePlaceholder from './components/PhasePlaceholder.jsx'
 import { useSettings } from './store/settings.js'
 import { useCheckins } from './store/checkins.js'
+import { useRelief } from './store/relief.js'
 import { isPinSupported } from './lib/pin.js'
 import { useT } from './lib/useT.js'
 
@@ -45,15 +51,15 @@ function AppRoutes() {
       <Route path="/grounding/done" element={<GroundingDoneScreen />} />
       <Route path="/grounding/:type" element={<ExerciseScreen />} />
 
-      {/* Phase 4 — Task 3 */}
-      <Route
-        path="/relief"
-        element={<PhasePlaceholder title={t('common.appName')} guard="relief_granted" />}
-      />
-      <Route
-        path="/supervisor"
-        element={<PhasePlaceholder title={t('common.appName')} guard="day_post" />}
-      />
+      {/* Task 3 — relief request. Fixed paths precede none here, but keep
+          /relief/status last-written for the same reason as grounding. */}
+      <Route path="/relief" element={<NeedScreen />} />
+      <Route path="/relief/reason" element={<ReasonScreen />} />
+      <Route path="/relief/preview" element={<PreviewScreen />} />
+      <Route path="/relief/status" element={<StatusScreen />} />
+
+      {/* Demo only — proves the privacy wall during the presentation. */}
+      <Route path="/supervisor" element={<SupervisorScreen />} />
 
       <Route
         path="/help"
@@ -84,12 +90,14 @@ function PinGate({ children }) {
 export default function App() {
   const lang = useSettings((s) => s.lang)
   const loadCheckins = useCheckins((s) => s.load)
+  const loadRelief = useRelief((s) => s.load)
 
-  // Hydrate once at start so the summary screens are ready before they're
-  // opened. Safe to call repeatedly — load() no-ops after the first run.
+  // Hydrate once at start so the summary screens and the tally are ready before
+  // they're opened. Safe to call repeatedly — load() no-ops after the first run.
   useEffect(() => {
     loadCheckins()
-  }, [loadCheckins])
+    loadRelief()
+  }, [loadCheckins, loadRelief])
 
   // Keep <html lang> in step with the toggle, so a screen reader announces
   // Bangla with Bangla phonetics rather than reading it as mislabelled English.

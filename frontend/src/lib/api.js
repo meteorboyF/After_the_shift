@@ -32,6 +32,16 @@ export const api = {
    */
   completeGrounding: (payload) =>
     attempt(() => client.post('/grounding/complete', payload).then(() => true)),
+
+  createRelief: (payload) => attempt(() => client.post('/relief', payload).then((r) => r.data)),
+  listRelief: () => attempt(() => client.get('/relief').then((r) => r.data)),
+  withdrawRelief: (id) => attempt(() => client.delete(`/relief/${id}`).then(() => true)),
+  reliefSummary: () => attempt(() => client.get('/relief/summary').then((r) => r.data)),
+
+  /** Demo route only — proves the wall on stage. Returns four fields per row. */
+  supervisorRelief: () => attempt(() => client.get('/supervisor/relief').then((r) => r.data)),
+  supervisorSetStatus: (id, status) =>
+    attempt(() => client.patch(`/supervisor/relief/${id}`, { status }).then(() => true)),
 }
 
 export default client

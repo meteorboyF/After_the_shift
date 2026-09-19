@@ -46,6 +46,22 @@ export function formatDay(isoString, lang) {
   return `${daysAgo} days ago`
 }
 
+/** "আজ, দুপুর ১টা" — used on the supervisor preview card. */
+export function formatDateTime(isoString, lang) {
+  const date = new Date(isoString)
+  return `${formatDay(isoString, lang)}, ${formatHour(date.getHours(), lang)}`
+}
+
+/** "এইমাত্র" / "৫ মিনিট আগে" / "২ ঘণ্টা আগে" — relative age on screen 3D. */
+export function relativeAge(isoString, t) {
+  const minutes = Math.max(0, Math.floor((Date.now() - new Date(isoString).getTime()) / 60_000))
+  if (minutes < 1) return t('relief.justNow')
+  if (minutes < 60) return t('relief.minutesAgo', { n: minutes })
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return t('relief.hoursAgo', { n: hours })
+  return null
+}
+
 /** Guards work two 12-hour shifts; 18:00–05:59 is the night one. */
 export function shiftTypeForNow(date = new Date()) {
   const h = date.getHours()

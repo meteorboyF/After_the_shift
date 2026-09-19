@@ -4,6 +4,10 @@ import com.aftertheshift.checkin.CheckIn;
 import com.aftertheshift.checkin.CheckInRepository;
 import com.aftertheshift.checkin.ShiftType;
 import com.aftertheshift.common.Guards;
+import com.aftertheshift.relief.ReliefRepository;
+import com.aftertheshift.relief.ReliefRequest;
+import com.aftertheshift.relief.ReliefStatus;
+import com.aftertheshift.relief.ReliefType;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -61,6 +65,59 @@ public class DataSeeder {
                         .shiftType(seed.shift())
                         .recordedAt(today.minusDays(seed.daysAgo())
                                 .atTime(LocalTime.of(seed.hour(), seed.minute()))
+                                .atZone(zone)
+                                .toInstant())
+                        .build());
+            }
+        };
+    }
+
+    /**
+     * Five requests this month, four accepted — so the tally on screen 3D reads
+     * "এই মাসে ৫টি অনুরোধ / ৪টি গ্রহণ করা হয়েছে" during the demo.
+     *
+     * That tally is the answer to P7, who saw no benefit in expression. An
+     * empty one would demonstrate his point rather than the counter-argument.
+     *
+     * All five are dated inside the current month, since the summary counts from
+     * the first of the month; seeding "N days ago" would silently under-report
+     * during the first week of a month.
+     */
+    @Bean
+    ApplicationRunner seedRelief(ReliefRepository relief,
+                                 @Value("${app.timezone:Asia/Dhaka}") String timezone) {
+        return args -> {
+            if (!relief.findByGuardIdOrderByCreatedAtDesc(Guards.DEMO_GUARD_ID).isEmpty()) {
+                return;
+            }
+
+            ZoneId zone = ZoneId.of(timezone);
+            LocalDate today = LocalDate.now(zone);
+            LocalDate monthStart = today.withDayOfMonth(1);
+
+            record Seed(int dayOfMonth, int hour, ReliefType type, ReliefStatus status) {
+            }
+
+            // Spread across the month but never later than today.
+            var seeds = new Seed[] {
+                new Seed(2, 14, ReliefType.SHADE_POST, ReliefStatus.ACCEPTED),
+                new Seed(6, 11, ReliefType.REST_HALF_HOUR, ReliefStatus.ACCEPTED),
+                new Seed(11, 16, ReliefType.POST_CHANGE, ReliefStatus.ACCEPTED),
+                new Seed(15, 9, ReliefType.REST_HALF_HOUR, ReliefStatus.ACCEPTED),
+                new Seed(18, 13, ReliefType.SHADE_POST, ReliefStatus.PENDING),
+            };
+
+            for (Seed seed : seeds) {
+                LocalDate when = monthStart.plusDays(seed.dayOfMonth() - 1L);
+                if (when.isAfter(today)) when = today;
+
+                relief.save(ReliefRequest.builder()
+                        .guardId(Guards.DEMO_GUARD_ID)
+                        .type(seed.type())
+                        .status(seed.status())
+                        .reasonAudioBase64(null)
+                        .reasonTranscript(null)
+                        .createdAt(when.atTime(LocalTime.of(seed.hour(), 0))
                                 .atZone(zone)
                                 .toInstant())
                         .build());
