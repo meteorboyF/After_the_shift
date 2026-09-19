@@ -39,4 +39,44 @@ export default {
     speak: 'বলুন',
     hardTime: 'এখন কষ্ট হচ্ছে',
   },
+
+  // Screen 1B. This screen listens; it does not ask. No prompt, no question,
+  // no suggestion chips — adding any would make it an interview.
+  record: {
+    listening: 'শুনছি',
+    done: 'শেষ',
+    cancel: 'বাতিল',
+    noMic: 'মাইক পাওয়া যায়নি',
+    noMicHint: 'শব্দ ছাড়াই রাখা যাবে',
+  },
+
+  // Screen 1C. Said plainly, before anything is stored — not in a settings page.
+  privacy: {
+    heading: 'এই রেকর্ড কে দেখতে পাবে?',
+    onlyYou: 'শুধু আপনি',
+    notSupervisor: 'সুপারভাইজার দেখতে পাবেন না',
+    staysOnPhone: 'ফোনেই থাকবে',
+    keep: 'রাখুন',
+    discard: 'মুছে ফেলুন',
+  },
+
+  // Screen 1D. The visible result — the thing P7 said was missing.
+  saved: {
+    heading: 'রাখা হয়েছে',
+    weekLabel: 'গত সাত দিন',
+    heaviest: 'বেশিরভাগ ভারি সময় — {time}',
+    requestRelief: 'বিশ্রাম চাই',
+    home: 'ঠিক আছে',
+  },
+
+  entries: {
+    heading: 'আগের রেকর্ড',
+    empty: 'এখনো কিছু নেই',
+    play: 'শুনুন',
+    pause: 'থামান',
+    remove: 'মুছে ফেলুন',
+    noAudio: 'শব্দ নেই',
+    night: 'রাতের ডিউটি',
+    day: 'দিনের ডিউটি',
+  },
 }

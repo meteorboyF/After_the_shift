@@ -35,4 +35,40 @@ export default {
     speak: 'Speak',
     hardTime: 'Having a hard time right now',
   },
+
+  record: {
+    listening: 'Listening',
+    done: 'Done',
+    cancel: 'Cancel',
+    noMic: 'No microphone available',
+    noMicHint: 'You can still keep this without sound',
+  },
+
+  privacy: {
+    heading: 'Who can see this entry?',
+    onlyYou: 'Only you',
+    notSupervisor: 'Your supervisor cannot see it',
+    staysOnPhone: 'Stays on your phone',
+    keep: 'Keep',
+    discard: 'Delete',
+  },
+
+  saved: {
+    heading: 'Saved',
+    weekLabel: 'Last seven days',
+    heaviest: 'Heaviest time — {time}',
+    requestRelief: 'Request relief',
+    home: 'All right',
+  },
+
+  entries: {
+    heading: 'Past entries',
+    empty: 'Nothing here yet',
+    play: 'Play',
+    pause: 'Pause',
+    remove: 'Delete',
+    noAudio: 'No sound',
+    night: 'Night duty',
+    day: 'Day duty',
+  },
 }

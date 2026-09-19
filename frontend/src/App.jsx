@@ -2,8 +2,13 @@ import { useEffect } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import HomeScreen from './features/home/HomeScreen.jsx'
 import PinScreen from './features/pin/PinScreen.jsx'
+import RecordScreen from './features/checkin/RecordScreen.jsx'
+import PrivacyScreen from './features/checkin/PrivacyScreen.jsx'
+import SavedScreen from './features/checkin/SavedScreen.jsx'
+import EntriesScreen from './features/checkin/EntriesScreen.jsx'
 import PhasePlaceholder from './components/PhasePlaceholder.jsx'
 import { useSettings } from './store/settings.js'
+import { useCheckins } from './store/checkins.js'
 import { isPinSupported } from './lib/pin.js'
 import { useT } from './lib/useT.js'
 
@@ -25,15 +30,11 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<HomeScreen />} />
 
-      {/* Phase 2 — Task 1 */}
-      <Route
-        path="/record"
-        element={<PhasePlaceholder title={t('home.speak')} guard="night_post" />}
-      />
-      <Route
-        path="/entries"
-        element={<PhasePlaceholder title={t('common.pastEntries')} guard="resting" />}
-      />
+      {/* Task 1 — post-shift check-in */}
+      <Route path="/record" element={<RecordScreen />} />
+      <Route path="/checkin/privacy" element={<PrivacyScreen />} />
+      <Route path="/checkin/saved" element={<SavedScreen />} />
+      <Route path="/entries" element={<EntriesScreen />} />
 
       {/* Phase 3 — Task 2 */}
       <Route
@@ -79,6 +80,13 @@ function PinGate({ children }) {
 
 export default function App() {
   const lang = useSettings((s) => s.lang)
+  const loadCheckins = useCheckins((s) => s.load)
+
+  // Hydrate once at start so the summary screens are ready before they're
+  // opened. Safe to call repeatedly — load() no-ops after the first run.
+  useEffect(() => {
+    loadCheckins()
+  }, [loadCheckins])
 
   // Keep <html lang> in step with the toggle, so a screen reader announces
   // Bangla with Bangla phonetics rather than reading it as mislabelled English.
