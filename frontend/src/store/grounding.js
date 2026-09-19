@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { api } from '../lib/api.js'
+import { enqueue } from '../lib/outbox.js'
 import { toExerciseType } from '../lib/exercises.js'
 
 const COUNTER_KEY = 'ats-grounding-count'
@@ -27,9 +27,9 @@ export const useGrounding = create((set, get) => ({
     set({ count: next })
     localStorage.setItem(COUNTER_KEY, String(next))
 
-    // Fire and forget. Nothing on screen waits for this, and the row it writes
-    // carries no guard id and no time finer than the day.
-    api.completeGrounding({
+    // Queued like everything else. Note there is no meta here — nothing links
+    // this entry back to a person, not even while it sits in the outbox.
+    enqueue('grounding', {
       exerciseType: toExerciseType(exercise),
       completed,
       abandonedAtSec: completed ? null : Math.round(elapsedSec),

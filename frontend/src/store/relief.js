@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { get as idbGet, set as idbSet } from 'idb-keyval'
 import { api } from '../lib/api.js'
+import { cancelQueued, enqueue, onDelivered } from '../lib/outbox.js'
 
 const STORE_KEY = 'ats-relief'
 
@@ -80,15 +81,9 @@ export const useRelief = create((set, get) => ({
     set({ requests: next, draft: null })
     await idbSet(STORE_KEY, next)
 
-    // Not awaited — the status screen must appear immediately.
-    api.createRelief(payload).then((created) => {
-      if (!created?.id) return
-      const linked = get().requests.map((r) =>
-        r.localId === request.localId ? { ...r, serverId: created.id } : r,
-      )
-      set({ requests: linked })
-      return idbSet(STORE_KEY, linked)
-    })
+    // Queued, not awaited — the status screen must appear immediately, and the
+    // request still reaches the supervisor once a connection exists.
+    enqueue('relief', payload, { localId: request.localId })
 
     return request
   },
@@ -99,7 +94,15 @@ export const useRelief = create((set, get) => ({
     const next = get().requests.filter((r) => r.localId !== localId)
     set({ requests: next })
     await idbSet(STORE_KEY, next)
-    if (target?.serverId) api.withdrawRelief(target.serverId)
+
+    // Withdrawing something that never synced cancels its pending send, so a
+    // request the guard took back is never delivered late.
+    const cancelled = await cancelQueued(
+      (queued) => queued.kind === 'relief' && queued.meta?.localId === localId,
+    )
+    if (cancelled === 0 && target?.serverId) {
+      enqueue('withdrawRelief', { id: target.serverId })
+    }
   },
 
   /** Pulls statuses a supervisor may have changed since last time. */
@@ -116,3 +119,14 @@ export const useRelief = create((set, get) => ({
     await idbSet(STORE_KEY, next)
   },
 }))
+
+/** Link the server id once a queued request is actually delivered. */
+onDelivered(async (entry, result) => {
+  if (entry.kind !== 'relief' || !result?.id) return
+  const { requests } = useRelief.getState()
+  const linked = requests.map((r) =>
+    r.localId === entry.meta?.localId ? { ...r, serverId: result.id } : r,
+  )
+  useRelief.setState({ requests: linked })
+  await idbSet(STORE_KEY, linked)
+})

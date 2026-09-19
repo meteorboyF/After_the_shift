@@ -22,6 +22,20 @@ export default {
     soon: 'পরের ধাপে আসছে',
   },
 
+  help: {
+    heading: 'সাহায্য',
+    listens: 'এই অ্যাপ শুধু শোনে',
+    listensBody: 'কোনো প্রশ্ন নেই, কোনো বিচার নেই।',
+    privacy: 'সুপারভাইজার দেখতে পাবেন না',
+    privacyBody: 'চেক-ইন, রেকর্ড ও ব্যায়াম কেউ দেখে না।',
+    offline: 'ইন্টারনেট ছাড়াই চলে',
+    offlineBody: 'সব কিছু ফোনেই থাকে।',
+    relief: 'বিশ্রামের অনুরোধ আলাদা',
+    reliefBody: 'শুধু এটাই সুপারভাইজার দেখেন।',
+    // Stated plainly: this is coursework, not care.
+    notClinical: 'এটি কোনো চিকিৎসা সেবা নয়।',
+  },
+
   pin: {
     setHeading: 'একটি পিন দিন',
     confirmHeading: 'আবার দিন',

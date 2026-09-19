@@ -80,8 +80,12 @@ cd frontend && npm install && npm run dev
 ```
 
 Serves on http://localhost:5173. **The frontend runs fine with the backend stopped** — that is
-a design requirement, not a fallback. Writes go to IndexedDB first and sync when a backend
-becomes reachable.
+a design requirement, not a fallback. Writes go to IndexedDB first and render immediately, then
+queue in a durable outbox (`src/lib/outbox.js`) that survives a reload and drains when a
+connection appears. Deleting something that has not synced yet cancels its queued create, so a
+withdrawn request is never delivered late.
+
+For a presentation walkthrough, see [DEMO.md](DEMO.md).
 
 ### Backend
 
@@ -116,9 +120,17 @@ backend/
     checkin/ grounding/ relief/ supervisor/ common/
 ```
 
-The `supervisor` package has no dependency on the check-in or grounding repositories. The
-privacy wall is a property of the architecture, not of a DTO mapper — a supervisor role cannot
-reach that data because the code path does not exist, not because the UI hides it.
+The `supervisor` package imports nothing from any feature package. It declares the narrow
+interface it needs (`ReliefBoardPort`) and `relief` implements it, so the dependency runs
+inward. `ReliefCard` is a four-field record with no slot for a guard id, reason audio or
+transcript — a supervisor endpoint for check-ins could not be written without first adding a
+dependency that does not exist.
+
+`PrivacyWallTest` asserts this and fails the build if it is ever broken:
+
+```bash
+cd backend && ./mvnw test
+```
 
 ---
 

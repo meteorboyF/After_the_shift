@@ -14,12 +14,12 @@ import ReasonScreen from './features/relief/ReasonScreen.jsx'
 import PreviewScreen from './features/relief/PreviewScreen.jsx'
 import StatusScreen from './features/relief/StatusScreen.jsx'
 import SupervisorScreen from './features/supervisor/SupervisorScreen.jsx'
-import PhasePlaceholder from './components/PhasePlaceholder.jsx'
+import HelpScreen from './features/help/HelpScreen.jsx'
 import { useSettings } from './store/settings.js'
 import { useCheckins } from './store/checkins.js'
 import { useRelief } from './store/relief.js'
 import { isPinSupported } from './lib/pin.js'
-import { useT } from './lib/useT.js'
+import { startOutbox } from './lib/outbox.js'
 
 /**
  * Routes render directly — no AnimatePresence wrapper.
@@ -33,8 +33,6 @@ import { useT } from './lib/useT.js'
  * asks for, minus the crossfade on the way out.
  */
 function AppRoutes() {
-  const { t } = useT()
-
   return (
     <Routes>
       <Route path="/" element={<HomeScreen />} />
@@ -61,10 +59,7 @@ function AppRoutes() {
       {/* Demo only — proves the privacy wall during the presentation. */}
       <Route path="/supervisor" element={<SupervisorScreen />} />
 
-      <Route
-        path="/help"
-        element={<PhasePlaceholder title={t('common.help')} guard="greeting" />}
-      />
+      <Route path="/help" element={<HelpScreen />} />
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
@@ -97,6 +92,9 @@ export default function App() {
   useEffect(() => {
     loadCheckins()
     loadRelief()
+    // Drain anything written while the backend was unreachable, and keep
+    // draining whenever the device comes back online.
+    startOutbox()
   }, [loadCheckins, loadRelief])
 
   // Keep <html lang> in step with the toggle, so a screen reader announces

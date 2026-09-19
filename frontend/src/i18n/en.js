@@ -18,6 +18,19 @@ export default {
     soon: 'Coming in the next phase',
   },
 
+  help: {
+    heading: 'Help',
+    listens: 'This app only listens',
+    listensBody: 'No questions, no judgement.',
+    privacy: 'Your supervisor cannot see it',
+    privacyBody: 'Nobody sees your check-ins, recordings or exercises.',
+    offline: 'Works without internet',
+    offlineBody: 'Everything stays on your phone.',
+    relief: 'Relief requests are separate',
+    reliefBody: 'This is the only thing a supervisor sees.',
+    notClinical: 'This is not a medical service.',
+  },
+
   pin: {
     setHeading: 'Set a PIN',
     confirmHeading: 'Enter it again',

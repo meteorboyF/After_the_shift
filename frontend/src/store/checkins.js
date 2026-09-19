@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { get as idbGet, set as idbSet } from 'idb-keyval'
 import { api } from '../lib/api.js'
+import { cancelQueued, enqueue, onDelivered } from '../lib/outbox.js'
 import { summarise } from '../lib/summary.js'
 
 const STORE_KEY = 'ats-checkins'
@@ -66,24 +67,20 @@ export const useCheckins = create((set, get) => ({
     set({ entries: next, pending: null })
     await idbSet(STORE_KEY, next)
 
-    // Deliberately not awaited. The local write above is what the guard was
-    // promised, and "রাখা হয়েছে" must appear immediately — a slow or hanging
-    // backend must never hold up that screen. When the call does land we just
-    // record the server id so a later delete can be mirrored.
-    api.createCheckIn({
-      audioBase64: entry.audioBase64 ?? null,
-      transcript: entry.transcript ?? null,
-      durationSec: Math.round(entry.durationSec),
-      shiftType: entry.shiftType,
-      recordedAt: entry.recordedAt,
-    }).then((created) => {
-      if (!created?.id) return
-      const linked = get().entries.map((e) =>
-        e.localId === entry.localId ? { ...e, serverId: created.id } : e,
-      )
-      set({ entries: linked })
-      return idbSet(STORE_KEY, linked)
-    })
+    // Queued, not awaited. The local write above is what the guard was promised
+    // and "রাখা হয়েছে" must appear immediately; the outbox delivers this
+    // whenever a connection next exists, including after a reload.
+    enqueue(
+      'checkin',
+      {
+        audioBase64: entry.audioBase64 ?? null,
+        transcript: entry.transcript ?? null,
+        durationSec: Math.round(entry.durationSec),
+        shiftType: entry.shiftType,
+        recordedAt: entry.recordedAt,
+      },
+      { localId: entry.localId },
+    )
 
     return entry
   },
@@ -93,10 +90,32 @@ export const useCheckins = create((set, get) => ({
     const next = get().entries.filter((e) => e.localId !== localId)
     set({ entries: next })
     await idbSet(STORE_KEY, next)
-    if (target?.serverId) api.deleteCheckIn(target.serverId)
+
+    // If this entry never synced, cancel its queued create rather than queueing
+    // a delete for a server id that does not exist yet.
+    const cancelled = await cancelQueued(
+      (queued) => queued.kind === 'checkin' && queued.meta?.localId === localId,
+    )
+    if (cancelled === 0 && target?.serverId) {
+      enqueue('deleteCheckin', { id: target.serverId })
+    }
   },
 
   summary() {
     return summarise(get().entries)
   },
 }))
+
+/**
+ * Record the server id once the outbox delivers a check-in, so a later delete
+ * can be mirrored rather than silently staying local.
+ */
+onDelivered(async (entry, result) => {
+  if (entry.kind !== 'checkin' || !result?.id) return
+  const { entries } = useCheckins.getState()
+  const linked = entries.map((e) =>
+    e.localId === entry.meta?.localId ? { ...e, serverId: result.id } : e,
+  )
+  useCheckins.setState({ entries: linked })
+  await idbSet(STORE_KEY, linked)
+})
