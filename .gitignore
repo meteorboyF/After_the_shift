@@ -1,0 +1,36 @@
+# dependencies / build output
+node_modules/
+dist/
+build/
+target/
+*.class
+
+# env
+.env
+.env.local
+.env.*.local
+application-local.properties
+
+# maven wrapper jar is fetched by mvnw on first run (pattern must not be
+# root-anchored — the wrapper lives under backend/)
+**/.mvn/wrapper/maven-wrapper.jar
+
+# H2 file database (demo data is re-seeded by DataSeeder)
+backend/data/
+*.db
+*.mv.db
+*.trace.db
+
+# editors / os
+.idea/
+.vscode/
+.DS_Store
+*.swp
+
+# logs
+*.log
+npm-debug.log*
+yarn-error.log*
+
+# the raw photo drop; the working copies live in frontend/public/images/guards/
+Photos*-*/

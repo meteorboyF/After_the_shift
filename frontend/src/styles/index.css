@@ -1,0 +1,76 @@
+@import './fonts.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    /* Base 18px. Reading happens in sunlight or at 3am, often over 40. */
+    font-size: 18px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-ink text-cream font-bangla antialiased;
+    /* Bangla conjuncts need the extra leading. */
+    line-height: 1.75;
+    margin: 0;
+    min-height: 100dvh;
+    overscroll-behavior-y: none;
+  }
+
+  /* No text input exists anywhere in this app by design, but if one is ever
+     added by accident this makes it obvious in review. */
+  input[type='text'],
+  input[type='search'],
+  textarea {
+    outline: 3px dashed theme('colors.warn');
+  }
+
+  button {
+    font-family: inherit;
+    color: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Keyboard focus stays visible — some guards will demo this on a laptop. */
+  :focus-visible {
+    outline: 3px solid theme('colors.amber.glow');
+    outline-offset: 3px;
+    border-radius: 0.75rem;
+  }
+}
+
+@layer utilities {
+  /* Every tappable thing clears the 64px minimum. */
+  .tap {
+    @apply min-h-tap min-w-tap;
+  }
+
+  /* Max ~7 Bangla words per line on primary screens. */
+  .measure {
+    max-width: 16ch;
+  }
+
+  .measure-wide {
+    max-width: 24ch;
+  }
+}
+
+/* Reduced motion: every pulse, breath and slide collapses to a plain fade.
+   Framer Motion variants check the same preference in JS (see lib/motion.js). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
