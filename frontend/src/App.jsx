@@ -6,6 +6,9 @@ import RecordScreen from './features/checkin/RecordScreen.jsx'
 import PrivacyScreen from './features/checkin/PrivacyScreen.jsx'
 import SavedScreen from './features/checkin/SavedScreen.jsx'
 import EntriesScreen from './features/checkin/EntriesScreen.jsx'
+import ChooseScreen from './features/grounding/ChooseScreen.jsx'
+import ExerciseScreen from './features/grounding/ExerciseScreen.jsx'
+import GroundingDoneScreen from './features/grounding/GroundingDoneScreen.jsx'
 import PhasePlaceholder from './components/PhasePlaceholder.jsx'
 import { useSettings } from './store/settings.js'
 import { useCheckins } from './store/checkins.js'
@@ -36,11 +39,11 @@ function AppRoutes() {
       <Route path="/checkin/saved" element={<SavedScreen />} />
       <Route path="/entries" element={<EntriesScreen />} />
 
-      {/* Phase 3 — Task 2 */}
-      <Route
-        path="/grounding"
-        element={<PhasePlaceholder title={t('home.hardTime')} guard="after_incident" />}
-      />
+      {/* Task 2 — post-incident grounding. /grounding/done sits before the
+          :type route so "done" is never mistaken for an exercise name. */}
+      <Route path="/grounding" element={<ChooseScreen />} />
+      <Route path="/grounding/done" element={<GroundingDoneScreen />} />
+      <Route path="/grounding/:type" element={<ExerciseScreen />} />
 
       {/* Phase 4 — Task 3 */}
       <Route

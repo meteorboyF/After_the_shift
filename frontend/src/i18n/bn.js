@@ -69,6 +69,30 @@ export default {
     home: 'ঠিক আছে',
   },
 
+  // Task 2. Note what never appears here: stress, mental health, therapy,
+  // counselling. None of those words belong on a screen a guard opens after a
+  // bad hour on a gate.
+  grounding: {
+    heading: 'দুই মিনিট',
+    water: 'চোখে-মুখে পানি',
+    breathing: 'ধীরে শ্বাস',
+    walk: 'একটু হাঁটুন',
+    minutes: '{n} মিনিট',
+    listen: 'শুনুন',
+    exit: 'বের হই',
+    stop: 'বন্ধ করুন',
+    in: 'নিন',
+    out: 'ছাড়ুন',
+    waterCue: 'চোখে-মুখে ঠান্ডা পানি দিন',
+    breathingCue: 'ধীরে শ্বাস নিন',
+    walkCue: 'ধীরে ধীরে একটু হাঁটুন',
+    done: 'শেষ',
+    // Literally true: no user id, no time finer than the day, nothing that
+    // joins back to a person. See GroundingCompletion.
+    notRecorded: 'এটা কোথাও লেখা হয়নি',
+    again: 'আবার',
+  },
+
   entries: {
     heading: 'আগের রেকর্ড',
     empty: 'এখনো কিছু নেই',

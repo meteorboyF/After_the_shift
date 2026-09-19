@@ -61,6 +61,25 @@ export default {
     home: 'All right',
   },
 
+  grounding: {
+    heading: 'Two minutes',
+    water: 'Water on the face',
+    breathing: 'Slow breathing',
+    walk: 'Walk a little',
+    minutes: '{n} min',
+    listen: 'Listen',
+    exit: 'Leave',
+    stop: 'Stop',
+    in: 'In',
+    out: 'Out',
+    waterCue: 'Put cold water on your face',
+    breathingCue: 'Breathe slowly',
+    walkCue: 'Walk slowly for a little while',
+    done: 'Done',
+    notRecorded: 'This was not recorded anywhere',
+    again: 'Again',
+  },
+
   entries: {
     heading: 'Past entries',
     empty: 'Nothing here yet',

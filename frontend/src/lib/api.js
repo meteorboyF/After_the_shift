@@ -25,6 +25,13 @@ export const api = {
   listCheckIns: () => attempt(() => client.get('/checkins').then((r) => r.data)),
   deleteCheckIn: (id) => attempt(() => client.delete(`/checkins/${id}`).then(() => true)),
   checkInSummary: () => attempt(() => client.get('/checkins/summary').then((r) => r.data)),
+
+  /**
+   * Write-only and deliberately guard-less — note there is no matching read.
+   * The X-Guard-Id default header is irrelevant here: the endpoint ignores it.
+   */
+  completeGrounding: (payload) =>
+    attempt(() => client.post('/grounding/complete', payload).then(() => true)),
 }
 
 export default client
