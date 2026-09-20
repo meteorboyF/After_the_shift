@@ -67,7 +67,10 @@ export default function DemoIndexScreen() {
   return (
     <ScreenShell scrollable guard="night_post" guardOpacity={0.16} topRight={<LanguageToggle />}>
       <div className="mt-2">
-        <p className="text-sm uppercase tracking-[0.22em] text-amber">{t('demo.kicker')}</p>
+        {/* No letter-spacing or uppercase on Bangla: both are Latin
+            typographic idioms, and tracking visibly pulls apart the conjuncts
+            that make a Bangla word readable. */}
+        <p className="text-sm font-semibold text-amber">{t('demo.kicker')}</p>
         <h1 className="mt-2 text-display font-semibold leading-tight text-cream">
           {t('demo.title')}
         </h1>
@@ -81,7 +84,7 @@ export default function DemoIndexScreen() {
         <p className="mt-2 text-center text-sm text-muted">{t('demo.startHint')}</p>
       </div>
 
-      <p className="mt-9 text-sm uppercase tracking-[0.18em] text-muted">
+      <p className="mt-9 text-sm font-semibold text-muted">
         {t('demo.tasksHeading')}
       </p>
       <div className="mt-3 flex flex-col gap-3">
@@ -106,7 +109,7 @@ export default function DemoIndexScreen() {
         ))}
       </div>
 
-      <p className="mt-8 text-sm uppercase tracking-[0.18em] text-muted">
+      <p className="mt-8 text-sm font-semibold text-muted">
         {t('demo.screensHeading')}
       </p>
       <div className="mt-3 grid grid-cols-2 gap-3">
