@@ -1,8 +1,10 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import { pageVariants } from '../lib/motion.js'
 import { tapFeedback } from '../lib/haptics.js'
+import { useLocation } from 'react-router-dom'
 import GuardIllustration from './GuardIllustration.jsx'
 import OfflineBadge from './OfflineBadge.jsx'
+import DemoChip from './DemoChip.jsx'
 import Icon from './Icon.jsx'
 
 /**
@@ -23,10 +25,13 @@ export default function ScreenShell({
   backLabel,
   topRight,
   bare = false,
+  /** The demo launcher is a list and needs to scroll; guard screens never do. */
+  scrollable = false,
   className = '',
 }) {
   const reduced = useReducedMotion()
   const variants = pageVariants(reduced)
+  const isDemoIndex = useLocation().pathname === '/demo'
 
   return (
     <motion.main
@@ -34,7 +39,7 @@ export default function ScreenShell({
       initial="initial"
       animate="enter"
       className={`relative mx-auto flex min-h-dvh w-full max-w-screenish flex-col
-        overflow-hidden px-6 pb-8 pt-5 ${className}`}
+        ${scrollable ? 'overflow-y-auto' : 'overflow-hidden'} px-6 pb-8 pt-5 ${className}`}
     >
       {guard && (
         <GuardIllustration
@@ -66,6 +71,9 @@ export default function ScreenShell({
 
           <div className="flex items-center gap-2">
             <OfflineBadge />
+            {/* The launcher passes its own topRight, so it never shows a chip
+                pointing back at itself. */}
+            {!isDemoIndex && <DemoChip />}
             {topRight}
           </div>
         </div>

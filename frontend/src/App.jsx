@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import HomeScreen from './features/home/HomeScreen.jsx'
 import PinScreen from './features/pin/PinScreen.jsx'
 import RecordScreen from './features/checkin/RecordScreen.jsx'
@@ -15,6 +15,7 @@ import PreviewScreen from './features/relief/PreviewScreen.jsx'
 import StatusScreen from './features/relief/StatusScreen.jsx'
 import SupervisorScreen from './features/supervisor/SupervisorScreen.jsx'
 import HelpScreen from './features/help/HelpScreen.jsx'
+import DemoIndexScreen from './features/demo/DemoIndexScreen.jsx'
 import { useSettings } from './store/settings.js'
 import { useCheckins } from './store/checkins.js'
 import { useRelief } from './store/relief.js'
@@ -61,20 +62,31 @@ function AppRoutes() {
 
       <Route path="/help" element={<HelpScreen />} />
 
+      {/* Demo scaffolding, not part of the guard's experience. */}
+      <Route path="/demo" element={<DemoIndexScreen />} />
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }
 
 /**
- * The PIN shell. Not a security boundary and not one of the three tasks — it
- * just keeps the check-in screens off the lock screen.
+ * Decides what the app opens on.
+ *
+ * The launcher comes first in demo mode, because the hosted link previously
+ * opened on an unexplained PIN keypad. The PIN itself is unchanged and is still
+ * reachable deliberately from the launcher — it is a real part of the app, just
+ * not a sensible front door for a visitor.
  *
  * Where SubtleCrypto is unavailable (a non-secure context) the PIN is skipped
  * entirely rather than falling back to storing the digits in the clear.
  */
-function PinGate({ children }) {
-  const { pinHash, pinSkipped, unlocked } = useSettings()
+function Gate({ children }) {
+  const location = useLocation()
+  const { demoMode, demoStarted, pinHash, pinSkipped, unlocked } = useSettings()
+
+  if (location.pathname === '/demo') return children
+  if (demoMode && !demoStarted) return <Navigate to="/demo" replace />
 
   if (!isPinSupported()) return children
   if (!pinHash && !pinSkipped) return <PinScreen mode="set" />
@@ -107,9 +119,9 @@ export default function App() {
     // basename keeps routing correct when the app is served from a repo
     // subpath on GitHub Pages. It is "/" for local development.
     <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <PinGate>
+      <Gate>
         <AppRoutes />
-      </PinGate>
+      </Gate>
     </BrowserRouter>
   )
 }

@@ -22,6 +22,37 @@ export default {
     soon: 'পরের ধাপে আসছে',
   },
 
+  // Demo scaffolding — NOT part of the guard's experience. This exists so the
+  // prototype can be presented and so the supervisor view is reachable at all
+  // (the spec asks for it "behind a demo toggle"). A guard would never see it.
+  demo: {
+    kicker: 'প্রোটোটাইপ ডেমো',
+    title: 'শিফটের পরে',
+    subtitle: 'ঢাকার একটি বিশ্ববিদ্যালয়ে ১২ ঘণ্টার শিফটে কাজ করা সিকিউরিটি গার্ডদের জন্য।',
+    start: 'গার্ডের মতো শুরু করুন',
+    startHint: 'আসল অ্যাপটি এখান থেকেই শুরু হয়',
+    tasksHeading: 'তিনটি কাজ',
+    task1: 'ডিউটি শেষে বলা',
+    task1Sub: 'বলুন → কে দেখবে → রাখা হলো',
+    task2: 'ঘটনার পরে শান্ত হওয়া',
+    task2Sub: 'তিনটি উপায় → ব্যায়াম → শেষ',
+    task3: 'বিশ্রামের অনুরোধ',
+    task3Sub: 'কি দরকার → কারণ → সুপারভাইজার যা দেখবেন',
+    screensHeading: 'আলাদা স্ক্রিন',
+    home: 'হোম',
+    entries: 'আগের রেকর্ড',
+    summary: 'সপ্তাহের সারাংশ',
+    breathing: 'শ্বাসের ব্যায়াম',
+    supervisor: 'সুপারভাইজার ভিউ',
+    supervisorHint: 'শুধু ডেমোর জন্য — প্রাইভেসি দেয়াল দেখাতে',
+    helpScreen: 'সাহায্য',
+    pin: 'পিন স্ক্রিন',
+    reset: 'ডেমো রিসেট করুন',
+    resetHint: 'সব লোকাল ডেটা মুছে নতুন করে শুরু',
+    backToDemo: 'ডেমো',
+    notClinical: 'কোর্স প্রজেক্ট — কোনো চিকিৎসা সেবা নয়।',
+  },
+
   help: {
     heading: 'সাহায্য',
     listens: 'এই অ্যাপ শুধু শোনে',

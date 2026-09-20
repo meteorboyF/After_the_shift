@@ -89,6 +89,11 @@ For a presentation walkthrough, see [DEMO.md](DEMO.md).
 
 **Hosted demo:** https://meteorboyf.github.io/After_the_shift/
 
+It opens on a demo launcher that explains the project, starts each task at its real first
+screen, reaches the supervisor view, and can reset itself between run-throughs. That launcher is
+scaffolding for presenting the prototype — a guard would never see it, and nothing inside the
+three tasks changes because of it.
+
 The hosted build is the guard-facing app only — the Spring Boot backend needs a JVM host and is
 not deployed. That is not a degraded mode: writes go to IndexedDB, and when no API is
 configured the device seeds its own demo history (`src/lib/demoSeed.js`) so the week strip and

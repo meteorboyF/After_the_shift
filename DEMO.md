@@ -18,7 +18,16 @@ Open **http://localhost:5173** and set the browser to a phone-sized viewport
 (DevTools → device toolbar → iPhone 12 Pro or similar). The app is designed for
 one thumb at 375px; showing it desktop-width undersells every layout decision.
 
-**Reset to a clean demo state** — paste into the browser console, then reload:
+**The app opens on a demo launcher** (`/demo`). It explains what the project is, starts each
+task at its real first screen, reaches the supervisor view, and has a **Reset the demo** button
+— use that between run-throughs rather than clearing storage by hand.
+
+The launcher is scaffolding, not product. Nothing inside the guard's experience changes: once
+you press **গার্ডের মতো শুরু করুন** ("Start as a guard") every screen is exactly as designed.
+A small **ডেমো** chip in the top bar returns you to the launcher from any screen — except the
+grounding exercise, which stays empty apart from its Stop control.
+
+If you need to reset from the console instead:
 
 ```js
 indexedDB.databases().then(dbs => dbs.forEach(d => indexedDB.deleteDatabase(d.name)));
@@ -38,7 +47,7 @@ The `demo` profile seeds one guard, 5 past check-ins across different hours, and
 
 ## 0 · PIN (20 seconds)
 
-First launch asks you to set a four-digit PIN — tap `১ ২ ৩ ৪`, then again to confirm.
+Open **পিন স্ক্রিন** from the launcher. Tap `১ ২ ৩ ৪`, then again to confirm.
 
 > "Not a security feature, and not one of the three tasks. It's here because P6 told
 > us he was already worried about a supervisor picking up his phone. Note the keypad
