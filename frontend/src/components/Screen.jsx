@@ -1,6 +1,7 @@
 import LangToggle from './LangToggle.jsx'
 import ZoneBadge from './ZoneBadge.jsx'
 import Scene from './Scene.jsx'
+import BackButton from './BackButton.jsx'
 
 /**
  * Every screen sits in this.
@@ -17,6 +18,7 @@ export default function Screen({
   sceneOpacity,
   lamp = 1,
   topLeft,
+  back,
   dock,
   children,
   className = '',
@@ -29,7 +31,7 @@ export default function Screen({
 
       <div className="relative z-10 mx-auto flex min-h-dvh w-full max-w-phone flex-col px-4">
         <header className="flex min-h-tap items-center justify-between pt-[max(env(safe-area-inset-top),8px)]">
-          {topLeft ?? <LangToggle />}
+          {topLeft ?? (back !== undefined ? <BackButton to={back} /> : <LangToggle />)}
           {zone && <ZoneBadge zone={zone} />}
         </header>
 
@@ -39,9 +41,9 @@ export default function Screen({
       </div>
 
       {dock && (
-        <div className="fixed inset-x-0 bottom-0 z-20 mx-auto max-w-phone px-4 pb-[max(env(safe-area-inset-bottom),16px)] pt-6">
+        <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 mx-auto max-w-phone px-4 pb-[max(env(safe-area-inset-bottom),16px)] pt-6">
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink via-ink/90 to-transparent" />
-          <div className="relative">{dock}</div>
+          <div className="pointer-events-auto relative">{dock}</div>
         </div>
       )}
     </>
