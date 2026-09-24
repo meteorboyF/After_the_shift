@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { zoneGet, zoneSet } from '../lib/zones.js'
 import { seedSuper } from '../lib/seed.js'
 import { useClock } from '../lib/clock.js'
+import { toSupervisorRecord } from '../lib/relief.js'
 
 /**
  * App-level state hydrated from the zone databases.
@@ -26,6 +27,30 @@ export const useApp = create((set) => ({
       await zoneSet('super', 'relief', relief)
     }
     set({ anchor, relief, ready: true })
+  },
+
+  /** The relief request being composed across 3A → 3B → 3C. Not stored until sent. */
+  draft: null,
+  setDraft(draft) {
+    set({ draft })
+  },
+
+  /** 3C "পাঠান": writes exactly the payload the preview rendered. */
+  async sendRelief(payload) {
+    const record = toSupervisorRecord(payload)
+    const relief = [record, ...useApp.getState().relief]
+    set({ relief, draft: null })
+    await zoneSet('super', 'relief', relief)
+    return record
+  },
+
+  /** Only a pending request can be withdrawn. It stays in history, marked. */
+  async withdrawRelief(id) {
+    const relief = useApp
+      .getState()
+      .relief.map((r) => (r.id === id && r.status === 'PENDING' ? { ...r, status: 'WITHDRAWN' } : r))
+    set({ relief })
+    await zoneSet('super', 'relief', relief)
   },
 }))
 
