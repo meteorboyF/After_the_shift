@@ -34,3 +34,6 @@ yarn-error.log*
 
 # the raw photo drop; the working copies live in frontend/public/images/guards/
 Photos*-*/
+
+# git bundles used to hand work between machines; the commits live in the repo
+*.bundle
