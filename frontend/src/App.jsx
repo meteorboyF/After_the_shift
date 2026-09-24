@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { HashRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import HomeScreen from './features/home/HomeScreen.jsx'
 import StyleguideScreen from './features/styleguide/StyleguideScreen.jsx'
 import ComingScreen from './features/coming/ComingScreen.jsx'
@@ -16,6 +16,30 @@ function ScrollTop() {
   const { pathname } = useLocation()
   useEffect(() => window.scrollTo(0, 0), [pathname])
   return null
+}
+
+/**
+ * Review builds only (VITE_REVIEW=1, used for the hosted review link): open on
+ * the style tile, and offer a way back to it from any screen. Never in the
+ * guard's build.
+ */
+const REVIEW = import.meta.env.VITE_REVIEW === '1'
+if (REVIEW && (window.location.hash === '' || window.location.hash === '#' || window.location.hash === '#/')) {
+  window.location.hash = '#/styleguide'
+}
+function ReviewChip() {
+  const { pathname } = useLocation()
+  const navigate = useNavigate()
+  if (!REVIEW || pathname === '/styleguide') return null
+  return (
+    <button
+      type="button"
+      onClick={() => navigate('/styleguide')}
+      className="fixed left-1/2 top-2 z-40 -translate-x-1/2 rounded-full border border-amber/40 bg-ink/80 px-4 py-2 text-[15px] text-amber-text backdrop-blur"
+    >
+      Review · style tile
+    </button>
+  )
 }
 
 export default function App() {
@@ -51,6 +75,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <Caption />
+      <ReviewChip />
     </HashRouter>
   )
 }
