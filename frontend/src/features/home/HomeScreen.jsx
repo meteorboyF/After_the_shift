@@ -5,6 +5,7 @@ import {
   ChevronRight,
   Coffee,
   Hourglass,
+  ListMusic,
   Lock,
   MapPin,
   Mic,
@@ -85,7 +86,7 @@ export default function HomeScreen() {
       scene={scene}
       sceneOpacity={0.3}
       lamp={kind === 'NIGHT' || phase === 'off' ? 1.1 : 0.75}
-      dock={<Button variant="secondary" icon={Wind} label={t('home.hardTime')} onClick={() => navigate('/grounding')} />}
+      dock={<Button variant="secondary" icon={Wind} label={t('home.hardTime')} onClick={() => navigate('/grounding', { state: { from: '/' } })} />}
     >
       <div className="mt-1 flex items-center justify-between gap-3">
         <h1
@@ -125,11 +126,14 @@ export default function HomeScreen() {
               {countdown.lead && <span className="text-label text-sand">{countdown.lead}</span>}
               <span className="text-[28px] font-semibold leading-tight text-cream">{countdown.value}</span>
             </p>
-            <QuietCheckIn
-              label={t('home.checkinQuiet')}
-              sub={t('home.checkinPrivate')}
-              onClick={() => navigate('/checkin')}
-            />
+            <div className="flex items-center gap-1 border-t border-ink-line/70">
+              <QuietCheckIn
+                label={t('home.checkinQuiet')}
+                sub={t('home.checkinPrivate')}
+                onClick={() => navigate('/checkin')}
+              />
+              <PastButton label={t('entries.heading')} onClick={() => navigate('/checkin/entries')} />
+            </div>
           </>
         )}
       </section>
@@ -193,7 +197,7 @@ function QuietCheckIn({ label, sub, onClick }) {
       type="button"
       onClick={onClick}
       {...press}
-      className="-mx-2 flex w-[calc(100%+1rem)] items-center gap-4 rounded-3xl border-t border-ink-line/70 px-2 py-2.5 text-left
+      className="-ml-2 flex min-w-0 flex-1 items-center gap-4 rounded-3xl px-2 py-2.5 text-left
         transition-colors duration-300 ease-calm hover:bg-ink-raised/50"
     >
       <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-2 border-amber/60 text-amber-glow">
@@ -206,6 +210,21 @@ function QuietCheckIn({ label, sub, onClick }) {
           {sub}
         </span>
       </span>
+    </button>
+  )
+}
+
+function PastButton({ label, onClick }) {
+  const press = useLongPress(label)
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      {...press}
+      aria-label={label}
+      className="-mr-2 flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-sand transition-colors duration-300 hover:bg-ink-raised/60 hover:text-cream"
+    >
+      <ListMusic size={26} strokeWidth={1.75} aria-hidden="true" />
     </button>
   )
 }

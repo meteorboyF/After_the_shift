@@ -3,6 +3,18 @@ import { HashRouter, Navigate, Route, Routes, useLocation, useNavigate } from 'r
 import HomeScreen from './features/home/HomeScreen.jsx'
 import StyleguideScreen from './features/styleguide/StyleguideScreen.jsx'
 import ComingScreen from './features/coming/ComingScreen.jsx'
+import RecordScreen from './features/checkin/RecordScreen.jsx'
+import PrivacyScreen from './features/checkin/PrivacyScreen.jsx'
+import SavedScreen from './features/checkin/SavedScreen.jsx'
+import EntriesScreen from './features/checkin/EntriesScreen.jsx'
+import ChooseScreen from './features/grounding/ChooseScreen.jsx'
+import ExerciseScreen from './features/grounding/ExerciseScreen.jsx'
+import DoneScreen from './features/grounding/DoneScreen.jsx'
+import NeedScreen from './features/relief/NeedScreen.jsx'
+import ReasonScreen from './features/relief/ReasonScreen.jsx'
+import PreviewScreen from './features/relief/PreviewScreen.jsx'
+import StatusScreen from './features/relief/StatusScreen.jsx'
+import { useCheckins } from './store/checkins.js'
 import Caption from './components/Caption.jsx'
 import { useApp, useLang } from './store/app.js'
 import { startClock } from './lib/clock.js'
@@ -47,10 +59,12 @@ export default function App() {
   const lang = useLang((s) => s.lang)
   const tile = (key) => translate(lang, `home.tiles.${key}`)
 
+  const loadCheckins = useCheckins((s) => s.load)
   useEffect(() => {
     startClock()
     hydrate()
-  }, [hydrate])
+    loadCheckins()
+  }, [hydrate, loadCheckins])
 
   useEffect(() => {
     document.documentElement.lang = lang
@@ -63,13 +77,27 @@ export default function App() {
         <Route path="/" element={<HomeScreen />} />
         <Route path="/styleguide" element={<StyleguideScreen />} />
 
-        {/* Phase 3–4. Each already carries the zone its real screen will have. */}
+        {/* Phase 4. Each already carries the zone its real screen will have. */}
         <Route path="/roster" element={<ComingScreen zone="super" title={tile('roster')} />} />
         <Route path="/hours" element={<ComingScreen zone="mine" title={tile('hours')} />} />
-        <Route path="/relief" element={<ComingScreen zone="super" title={tile('relief')} />} />
         <Route path="/swap" element={<ComingScreen zone="peers" title={tile('swap')} />} />
-        <Route path="/checkin" element={<ComingScreen zone="mine" />} />
-        <Route path="/grounding" element={<ComingScreen zone="mine" title={translate(lang, 'home.hardTime')} />} />
+
+        {/* Task 1 — post-shift check-in (MINE zone) */}
+        <Route path="/checkin" element={<RecordScreen />} />
+        <Route path="/checkin/privacy" element={<PrivacyScreen />} />
+        <Route path="/checkin/saved" element={<SavedScreen />} />
+        <Route path="/checkin/entries" element={<EntriesScreen />} />
+
+        {/* Task 2 — grounding (MINE zone; nothing about a session is stored) */}
+        <Route path="/grounding" element={<ChooseScreen />} />
+        <Route path="/grounding/done" element={<DoneScreen />} />
+        <Route path="/grounding/:type" element={<ExerciseScreen />} />
+
+        {/* Task 3 — relief request (SUPERVISOR zone) */}
+        <Route path="/relief" element={<NeedScreen />} />
+        <Route path="/relief/reason" element={<ReasonScreen />} />
+        <Route path="/relief/preview" element={<PreviewScreen />} />
+        <Route path="/relief/status" element={<StatusScreen />} />
         <Route path="/sleep" element={<ComingScreen zone="mine" title={translate(lang, 'home.rotationLink')} />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
