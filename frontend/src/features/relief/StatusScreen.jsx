@@ -28,7 +28,7 @@ export default function StatusScreen() {
   const past = sorted.filter((r) => r.status !== 'PENDING')
 
   return (
-    <Screen zone="super" back="/">
+    <Screen zone="super" tabs>
       <Heading className="mt-2">{t('relief.statusHeading')}</Heading>
 
       <div className="surface mt-5 flex items-center gap-4 p-5">
@@ -73,8 +73,7 @@ export default function StatusScreen() {
       )}
 
       <div className="mt-auto flex flex-col gap-3 pt-8">
-        <Button variant="primary" icon={Check} label={t('relief.ok')} onClick={() => navigate('/')} />
-        <Button variant="secondary" icon={Plus} label={t('relief.newRequest')} onClick={() => navigate('/relief')} />
+        <Button variant="primary" icon={Plus} label={t('relief.newRequest')} onClick={() => navigate('/relief')} />
       </div>
     </Screen>
   )

@@ -24,7 +24,7 @@ export default function ChooseScreen() {
     )
 
   return (
-    <Screen zone="mine" back={from} lamp={0.85}>
+    <Screen zone="mine" tabs lamp={0.85}>
       <div className="mt-2 flex items-start justify-between gap-3">
         <div>
           <Heading>{t('grounding.heading')}</Heading>

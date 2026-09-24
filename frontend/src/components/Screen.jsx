@@ -2,6 +2,7 @@ import LangToggle from './LangToggle.jsx'
 import ZoneBadge from './ZoneBadge.jsx'
 import Scene from './Scene.jsx'
 import BackButton from './BackButton.jsx'
+import TabBar from './TabBar.jsx'
 
 /**
  * Every screen sits in this.
@@ -11,6 +12,7 @@ import BackButton from './BackButton.jsx'
  * - A top bar: language on the left, the zone badge on the right — same place
  *   on every screen.
  * - `dock`: a control pinned to the bottom, always one thumb away.
+ * - `tabs`: the app's bottom navigation (main screens only, never inside a flow).
  */
 export default function Screen({
   zone,
@@ -20,6 +22,7 @@ export default function Screen({
   topLeft,
   back,
   dock,
+  tabs = false,
   children,
   className = '',
 }) {
@@ -35,12 +38,14 @@ export default function Screen({
           {zone && <ZoneBadge zone={zone} />}
         </header>
 
-        <main className={`anim-rise flex flex-1 flex-col ${dock ? 'pb-32' : 'pb-8'} ${className}`}>
+        <main className={`anim-rise flex flex-1 flex-col ${tabs ? 'pb-32' : dock ? 'pb-32' : 'pb-8'} ${className}`}>
           {children}
         </main>
       </div>
 
-      {dock && (
+      {tabs && <TabBar />}
+
+      {dock && !tabs && (
         <div className="pointer-events-none fixed inset-x-0 bottom-0 z-20 mx-auto max-w-phone px-4 pb-[max(env(safe-area-inset-bottom),16px)] pt-6">
           <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink via-ink/90 to-transparent" />
           <div className="pointer-events-auto relative">{dock}</div>

@@ -1,27 +1,27 @@
 import { useNavigate } from 'react-router-dom'
 import {
   ArrowLeftRight,
-  CalendarDays,
   ChevronRight,
   Coffee,
-  Hourglass,
+  House,
+  IdCard,
   ListMusic,
   Lock,
   MapPin,
   Mic,
   Moon,
   Sun,
-  Wind,
 } from 'lucide-react'
 import Screen from '../../components/Screen.jsx'
 import Tile from '../../components/Tile.jsx'
-import Button from '../../components/Button.jsx'
+import HeatCard from '../heat/HeatCard.jsx'
 import VoiceButton from '../../components/VoiceButton.jsx'
 import ShiftArc from './ShiftArc.jsx'
 import { useT } from '../../i18n/index.js'
 import { useNow } from '../../lib/clock.js'
 import { useApp } from '../../store/app.js'
-import { NEIGHBOURS, POSTS, hoursThisWeek, shiftState } from '../../lib/roster.js'
+import { daysUntilLeave, NEIGHBOURS, POSTS, shiftState } from '../../lib/roster.js'
+import { typicalRange } from '../../lib/heat.js'
 import { clockTime, duration, relativeDay } from '../../lib/format.js'
 import { useLongPress } from '../../lib/useLongPress.js'
 
@@ -31,8 +31,8 @@ import { useLongPress } from '../../lib/useLongPress.js'
  * The first screen is about the SHIFT, not about feelings (six of eight guards
  * rejected a wellbeing app; none rejected help with the job). The check-in is
  * here, but quiet — it rises only in the last hour of a shift and the first hour
- * after, when there is something to say. "এখন কষ্ট হচ্ছে" is pinned to the
- * bottom so it is always one tap away.
+ * after, when there is something to say. "এখন কষ্ট হচ্ছে" sits in the centre
+ * of the tab bar, so it is one tap away from every main screen.
  *
  * Deliberately absent: greeting by name, stats about the guard, notification
  * badges, anything that asks how he feels.
@@ -44,7 +44,7 @@ export default function HomeScreen() {
   const anchor = useApp((s) => s.anchor)
   const relief = useApp((s) => s.relief)
 
-  if (!anchor) return <Screen zone="mine" />
+  if (!anchor) return <Screen zone="mine" tabs />
 
   const state = shiftState(anchor, now)
   const { phase, focus } = state
@@ -74,10 +74,11 @@ export default function HomeScreen() {
         ? { lead: null, value: t('home.endedAgo', { d: duration(state.sinceEndMs, lang) }) }
         : { lead: t('home.startsIn', { d: '' }).trim(), value: duration(state.untilStartMs, lang) }
 
-  const nextShift = state.next
   const pending = relief.filter((r) => r.status === 'PENDING').length
   const neighbours = NEIGHBOURS[kind].length
-  const hours = hoursThisWeek(anchor, now)
+  const leaveIn = daysUntilLeave(anchor, now)
+  // Heat card: day shifts only, hot months only, and only because he opened the app.
+  const showHeat = kind === 'DAY' && (phase === 'on' || phase === 'lastHour') && typicalRange(now).hot
   const rotation = state.rotation && state.rotation.daysAway <= 3 && state.rotation.daysAway > 0 ? state.rotation : null
 
   return (
@@ -86,7 +87,7 @@ export default function HomeScreen() {
       scene={scene}
       sceneOpacity={0.3}
       lamp={kind === 'NIGHT' || phase === 'off' ? 1.1 : 0.75}
-      dock={<Button variant="secondary" icon={Wind} label={t('home.hardTime')} onClick={() => navigate('/grounding', { state: { from: '/' } })} />}
+      tabs
     >
       <div className="mt-1 flex items-center justify-between gap-3">
         <h1
@@ -151,25 +152,7 @@ export default function HomeScreen() {
         />
       )}
 
-      <nav className="mt-3 grid grid-cols-2 gap-3" aria-label="menu">
-        <Tile
-          icon={CalendarDays}
-          label={t('home.tiles.roster')}
-          fact={
-            nextShift
-              ? t('home.tileNext', { day: relativeDay(nextShift.start, now, lang), time: clockTime(nextShift.start, lang) })
-              : t('home.offShift')
-          }
-          zone="super"
-          onClick={() => navigate('/roster')}
-        />
-        <Tile
-          icon={Hourglass}
-          label={t('home.tiles.hours')}
-          fact={t('home.tileHours', { n: hours })}
-          zone="mine"
-          onClick={() => navigate('/hours')}
-        />
+      <div className="mt-3 grid grid-cols-2 gap-3">
         <Tile
           icon={Coffee}
           label={t('home.tiles.relief')}
@@ -184,7 +167,17 @@ export default function HomeScreen() {
           zone="peers"
           onClick={() => navigate('/swap')}
         />
-      </nav>
+        <Tile
+          icon={House}
+          label={t('home.tiles.leave')}
+          fact={t('home.tileLeave', { n: leaveIn })}
+          zone="super"
+          onClick={() => navigate('/roster')}
+        />
+        <Tile icon={IdCard} label={t('idcard.tile')} fact={t('idcard.tileFact')} onClick={() => navigate('/id')} />
+      </div>
+
+      {showHeat && <HeatCard shiftId={state.current.id} now={now} anchor={anchor} />}
     </Screen>
   )
 }
