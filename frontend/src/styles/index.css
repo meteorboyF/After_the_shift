@@ -1,4 +1,15 @@
-@import './fonts.css';
+/* Fonts are bundled, not fetched from a CDN — the app must open offline. */
+@import '@fontsource/hind-siliguri/bengali-400.css';
+@import '@fontsource/hind-siliguri/bengali-500.css';
+@import '@fontsource/hind-siliguri/bengali-600.css';
+@import '@fontsource/hind-siliguri/latin-400.css';
+@import '@fontsource/hind-siliguri/latin-500.css';
+@import '@fontsource/hind-siliguri/latin-600.css';
+@import '@fontsource/tiro-bangla/bengali-400.css';
+@import '@fontsource/tiro-bangla/latin-400.css';
+@import '@fontsource/fraunces/latin-400.css';
+@import '@fontsource/fraunces/latin-600.css';
+@import '@fontsource/fraunces/latin-400-italic.css';
 
 @tailwind base;
 @tailwind components;
@@ -7,70 +18,119 @@
 @layer base {
   :root {
     color-scheme: dark;
+    /* The lamp. One warm source, always from above. Screens can dim or warm it. */
+    --lamp-strength: 1;
+    --lamp-x: 50%;
   }
 
   html {
-    /* Base 18px. Reading happens in sunlight or at 3am, often over 40. */
-    font-size: 18px;
-    -webkit-text-size-adjust: 100%;
+    background: #12151f;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
-    @apply bg-ink text-cream font-bangla antialiased;
-    /* Bangla conjuncts need the extra leading. */
-    line-height: 1.75;
-    margin: 0;
+    @apply bg-ink font-ui text-body text-cream antialiased;
     min-height: 100dvh;
     overscroll-behavior-y: none;
   }
 
-  /* No text input exists anywhere in this app by design, but if one is ever
-     added by accident this makes it obvious in review. */
-  input[type='text'],
-  input[type='search'],
-  textarea {
-    outline: 3px dashed theme('colors.warn');
+  /* Bangla clips without generous leading. */
+  :lang(bn) {
+    line-height: 1.7;
   }
 
   button {
-    font-family: inherit;
-    color: inherit;
-    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
   }
 
-  /* Keyboard focus stays visible — some guards will demo this on a laptop. */
   :focus-visible {
-    outline: 3px solid theme('colors.amber.glow');
+    outline: 3px solid #ffc46b;
     outline-offset: 3px;
-    border-radius: 0.75rem;
+    border-radius: 1rem;
+  }
+
+  ::selection {
+    background: rgba(232, 161, 58, 0.35);
   }
 }
 
-@layer utilities {
-  /* Every tappable thing clears the 64px minimum. */
+@layer components {
+  /* The atmosphere behind every screen: lamp light + film grain. */
+  .atmosphere {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background:
+      radial-gradient(
+        70% 42% at var(--lamp-x) -6%,
+        rgba(255, 196, 107, calc(0.26 * var(--lamp-strength))) 0%,
+        rgba(232, 161, 58, calc(0.1 * var(--lamp-strength))) 38%,
+        rgba(18, 21, 31, 0) 72%
+      ),
+      radial-gradient(120% 80% at 50% 120%, rgba(10, 12, 20, 0.9), rgba(18, 21, 31, 0) 60%),
+      #12151f;
+  }
+
+  .grain {
+    position: fixed;
+    inset: -50%;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.045;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  /* A card lifted by light, not by a drop shadow: 1px highlight on the top edge. */
+  .surface {
+    @apply rounded-4xl bg-ink-soft/90 shadow-lift;
+    background-image: linear-gradient(180deg, rgba(245, 237, 225, 0.035), rgba(245, 237, 225, 0) 40%);
+    border: 1px solid rgba(46, 53, 72, 0.7);
+  }
+
+  .surface-raised {
+    @apply rounded-4xl bg-ink-raised shadow-lift;
+    background-image: linear-gradient(180deg, rgba(245, 237, 225, 0.05), rgba(245, 237, 225, 0) 45%);
+    border: 1px solid rgba(58, 66, 88, 0.6);
+  }
+
   .tap {
     @apply min-h-tap min-w-tap;
   }
 
-  /* Max ~7 Bangla words per line on primary screens. */
   .measure {
-    max-width: 16ch;
-  }
-
-  .measure-wide {
-    max-width: 24ch;
+    max-width: 17em;
   }
 }
 
-/* Reduced motion: every pulse, breath and slide collapses to a plain fade.
-   Framer Motion variants check the same preference in JS (see lib/motion.js). */
+/* Calm motion. Long, eased, no overshoot. */
+@keyframes lamp-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+@keyframes halo {
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.14); }
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes scene-in {
+  from { opacity: 0; }
+  to { opacity: var(--scene-opacity, 0.34); }
+}
+
+.anim-breathe { animation: lamp-breathe 4s ease-in-out infinite; }
+.anim-halo { animation: halo 4s ease-in-out infinite; }
+.anim-rise { animation: rise 320ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
+  .anim-breathe, .anim-halo { animation: none; }
+  .anim-rise { animation: fade 200ms linear both; }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  *, *::before, *::after { scroll-behavior: auto !important; }
 }

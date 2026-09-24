@@ -1,9 +1,9 @@
 name: Deploy frontend to GitHub Pages
 
-# The hosted build is the guard-facing app only. The Spring Boot backend needs
-# a JVM host and is not deployed here, which the app handles by design: writes
-# go to IndexedDB and the summary screens seed themselves when no API is
-# configured. See frontend/src/lib/demoSeed.js.
+# The hosted build is the whole guard-facing app. The Spring Boot backend needs a
+# JVM host and is not deployed; the app never needs it — every zone lives in an
+# on-device database and seeds itself on first launch (frontend/src/lib/seed.js).
+# Routing is hash-based and base is fixed in vite.config.js, so no env is needed.
 
 on:
   push:
@@ -42,10 +42,6 @@ jobs:
 
       - name: Build
         working-directory: frontend
-        # Pages serves this from /After_the_shift/, so asset URLs and the
-        # router basename both need the subpath baked in at build time.
-        env:
-          BASE_PATH: /After_the_shift/
         run: npm run build
 
       - uses: actions/upload-pages-artifact@v3

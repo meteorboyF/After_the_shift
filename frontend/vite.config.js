@@ -1,32 +1,40 @@
-import { copyFileSync } from 'node:fs'
-import { resolve } from 'node:path'
 import react from '@vitejs/plugin-react'
 import { defineConfig } from 'vite'
+import { VitePWA } from 'vite-plugin-pwa'
 
 /**
- * GitHub Pages serves a project site from /<repo>/, not from the domain root,
- * so the build needs a base path. Local dev stays at "/" — set BASE_PATH only
- * in the Pages workflow.
+ * Served from https://meteorboyf.github.io/After_the_shift/.
+ *
+ * Routing is hash-based (see App.jsx), so every route is the same static
+ * index.html as far as GitHub Pages is concerned — no 404.html trick, no 404
+ * status on deep links.
+ *
+ * The service worker precaches the whole app shell, fonts and scene images, so
+ * after one visit the app opens with no network at all (rule 8).
  */
-const base = process.env.BASE_PATH ?? '/'
-
-/**
- * Pages has no SPA rewrite rule: a deep link like /After_the_shift/relief is a
- * real 404 as far as the static host is concerned. Serving the same document as
- * 404.html makes the router pick the route up instead, so refreshing on any
- * screen works.
- */
-function spaFallback() {
-  return {
-    name: 'pages-spa-fallback',
-    closeBundle() {
-      const dist = resolve(__dirname, 'dist')
-      copyFileSync(resolve(dist, 'index.html'), resolve(dist, '404.html'))
-    },
-  }
-}
-
 export default defineConfig({
-  base,
-  plugins: [react(), spaFallback()],
+  base: '/After_the_shift/',
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      injectRegister: null,
+      includeAssets: ['lamp.svg', 'scenes/*.webp'],
+      manifest: {
+        name: 'শিফটের পরে — After the Shift',
+        short_name: 'শিফটের পরে',
+        lang: 'bn',
+        start_url: '/After_the_shift/',
+        scope: '/After_the_shift/',
+        display: 'standalone',
+        background_color: '#12151F',
+        theme_color: '#12151F',
+        icons: [{ src: 'lamp.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' }],
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,webp,woff2}'],
+        navigateFallback: 'index.html',
+      },
+    }),
+  ],
 })

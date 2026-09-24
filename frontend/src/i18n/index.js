@@ -1,33 +1,30 @@
 import bn from './bn.js'
 import en from './en.js'
-import { localeDigits } from '../lib/format.js'
+import { useLang } from '../store/app.js'
+import { num } from '../lib/format.js'
 
-export const DICTIONARIES = { bn, en }
-export const LANGUAGES = ['bn', 'en']
-export const PRIMARY_LANGUAGE = 'bn'
+const DICTS = { bn, en }
 
-function lookup(dict, path) {
-  return path.split('.').reduce((node, key) => (node == null ? undefined : node[key]), dict)
+function lookup(dict, key) {
+  return key.split('.').reduce((node, part) => (node == null ? node : node[part]), dict)
 }
 
 /**
- * Resolve a dotted key for `lang`, falling back to Bangla — the primary — and
- * finally to the key itself so a missing string is loud in review rather than
- * silently blank.
- *
- * Values in {braces} are substituted from `vars` and any digits in them are
- * rendered in the active script.
+ * t('home.endsIn', { d: '২ ঘণ্টা' }). Numbers in vars are localised; strings
+ * are inserted as-is (callers pre-format durations and times).
  */
-export function translate(lang, key, vars) {
-  const raw =
-    lookup(DICTIONARIES[lang] ?? {}, key) ??
-    lookup(DICTIONARIES[PRIMARY_LANGUAGE], key) ??
-    key
+export function translate(lang, key, vars = {}) {
+  let value = lookup(DICTS[lang], key)
+  if (value == null) value = lookup(bn, key)
+  if (typeof value !== 'string') return value ?? key
+  return value.replace(/\{(\w+)\}/g, (_, name) => {
+    const v = vars[name]
+    if (v == null) return ''
+    return typeof v === 'number' ? num(v, lang) : v
+  })
+}
 
-  if (typeof raw !== 'string') return key
-  if (!vars) return localeDigits(raw, lang)
-
-  return raw.replace(/\{(\w+)\}/g, (match, name) =>
-    name in vars ? localeDigits(vars[name], lang) : match,
-  )
+export function useT() {
+  const lang = useLang((s) => s.lang)
+  return { lang, t: (key, vars) => translate(lang, key, vars) }
 }
